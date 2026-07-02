@@ -3,6 +3,6 @@
      "downloadUrl": "https://REPLACE-WITH-SHAREPOINT-LINK",
      "message": "A newer version is available. Please download the latest version.",
      "disabled": false,
-     "announcement": "Hallo",
+     "announcement": "",
      "announcementLevel": "info"
    }

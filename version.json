@@ -1,5 +1,8 @@
 {
-  "latest": "1.0",
-  "downloadUrl": "https://REPLACE-WITH-SHAREPOINT-LINK",
-  "message": "A newer version is available. Please download the latest version."
-}
+     "latest": "1.0",
+     "downloadUrl": "https://REPLACE-WITH-SHAREPOINT-LINK",
+     "message": "A newer version is available. Please download the latest version.",
+     "disabled": false,
+     "announcement": "",
+     "announcementLevel": "info"
+   }

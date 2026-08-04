@@ -4,5 +4,5 @@
      "message": "A newer version is available. Please download the latest version.",
      "disabled": false,
      "announcement": "TESTING INFO BANNER",
-     "announcementLevel": "info"
+     "announcementLevel": "warn"
    }

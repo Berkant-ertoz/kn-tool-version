@@ -1,0 +1,66 @@
+name: Update EFS week
+
+# Weekly two-number update from Ferdinand's mail.
+# Actions tab | "Update EFS week" | Run workflow | enter EFS Truck % and EFS Barge % | Run.
+# The next week (last "to" + 1 day, 7 days long) is calculated automatically.
+# Fuel percentages are carried over from the last week.
+
+on:
+  workflow_dispatch:
+    inputs:
+      efs_truck:
+        description: 'EFS Truck % (whole number, e.g. 7)'
+        required: true
+      efs_barge:
+        description: 'EFS Barge % (whole number, e.g. 8)'
+        required: true
+      week_from:
+        description: 'Optional start date YYYY-MM-DD (leave empty for the week after the last one)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  add-week:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate and append week
+        run: |
+          T="${{ github.event.inputs.efs_truck }}"
+          B="${{ github.event.inputs.efs_barge }}"
+          echo "$T" | grep -Eq '^[0-9]{1,2}$' || { echo "efs_truck must be a whole number"; exit 1; }
+          echo "$B" | grep -Eq '^[0-9]{1,2}$' || { echo "efs_barge must be a whole number"; exit 1; }
+          [ "$T" -le 50 ] && [ "$B" -le 50 ] || { echo "percentages out of range (0-50)"; exit 1; }
+          jq -e '.weeks | length > 0' efs.json > /dev/null || { echo "efs.json invalid"; exit 1; }
+          LASTTO=$(jq -r '.weeks[-1].to' efs.json)
+          TF=$(jq '.weeks[-1].tf' efs.json)
+          BF=$(jq '.weeks[-1].bf' efs.json)
+          FROM="${{ github.event.inputs.week_from }}"
+          if [ -z "$FROM" ]; then FROM=$(date -u -d "$LASTTO + 1 day" +%F); fi
+          echo "$FROM" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' || { echo "week_from invalid"; exit 1; }
+          TO=$(date -u -d "$FROM + 6 days" +%F)
+          TE=$(awk "BEGIN{printf \"%.2f\", $T/100}")
+          BE=$(awk "BEGIN{printf \"%.2f\", $B/100}")
+          echo "adding: $FROM..$TO | fuel $TF/$BF | EFS $TE/$BE"
+          jq --arg f "$FROM" --arg t "$TO" \
+             --argjson tf "$TF" --argjson te "$TE" --argjson bf "$BF" --argjson be "$BE" \
+             '.weeks |= ((map(select(.from != $f))) + [{from:$f,to:$t,tf:$tf,te:$te,bf:$bf,be:$be}] | sort_by(.from))' \
+             efs.json > efs.new && mv efs.new efs.json
+          jq . efs.json > /dev/null || { echo "result invalid - abort"; exit 1; }
+          tail -c 400 efs.json
+
+      - name: Commit
+        run: |
+          git config user.name  "kn-efs-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if [ -n "$(git status --porcelain efs.json)" ]; then
+            git add efs.json
+            git commit -m "EFS week ${{ github.event.inputs.efs_truck }}%/${{ github.event.inputs.efs_barge }}% ($(date -u +%F))"
+            git push
+          else
+            echo "no change"
+          fi

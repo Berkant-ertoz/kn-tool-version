@@ -1,8 +1,8 @@
 {
-     "latest": "1.1.1",
+     "latest": "1.2.1",
      "downloadUrl": "https://kuehnenagel.sharepoint.com/:f:/s/FSNLDTradeManagementTeam/IgDAO0qWEBJWT6PXg5lHbM6qARFYsmxVUZHXqZav_nm5qAs?e=sUxBn5",
      "message": "A newer version is available. Please download the latest version.",
      "disabled": false,
-     "announcement": "Rhine low water and DE capacity shortage may also affect NL: barge capacity and transit times at risk, trucking may tighten | book early, quote with buffer | unavoidable D&D and storage per BAL tariff to the freight payer",
+     "announcement": "NL disruption: Fri 4 Sep port strike (Rotterdam/Amsterdam/Zeeland) left a terminal backlog still clearing, and Wed 9 Sep sees a 24h rail strike | expect the rail stop to push extra volume onto truck and barge, tightening capacity and slots | book early and quote with buffer",
      "announcementLevel": "warn"
    }
